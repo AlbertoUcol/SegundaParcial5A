@@ -14,73 +14,95 @@ class ProductCard extends StatelessWidget {
 
     return Card(
       clipBehavior: Clip.antiAlias,
+      margin: EdgeInsets.zero,
       child: InkWell(
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(12),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 82,
-                height: 82,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: Image.network(
-                  product.image,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) => const Center(
-                    child: Icon(
-                      Icons.inventory_2_rounded,
-                      color: Color(0xFF7041B8),
-                      size: 34,
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF7F5FA),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Image.network(
+                    product.image,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) => Center(
+                      child: Icon(
+                        Icons.inventory_2_rounded,
+                        color: theme.colorScheme.primary,
+                        size: 42,
+                      ),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      product.title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      product.category,
+              const SizedBox(height: 12),
+              Text(
+                _categoryLabel(product.category),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.secondary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                product.title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  height: 1.25,
+                ),
+              ),
+              const Spacer(),
+              Divider(
+                height: 16,
+                color: theme.colorScheme.outlineVariant.withValues(alpha: 0.6),
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: Text(
+                      '\$${product.price.toStringAsFixed(2)}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.secondary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '\$${product.price.toStringAsFixed(2)}',
                       style: theme.textTheme.titleMedium?.copyWith(
                         color: theme.colorScheme.primary,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
-                  ],
-                ),
-              ),
-              Icon(
-                Icons.chevron_right_rounded,
-                color: theme.colorScheme.primary,
+                  ),
+                  Icon(
+                    Icons.arrow_forward_rounded,
+                    color: theme.colorScheme.secondary,
+                    size: 20,
+                  ),
+                ],
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  static String _categoryLabel(String category) {
+    return switch (category.toLowerCase()) {
+      'electronics' => 'Electrónica',
+      'jewelery' => 'Joyería',
+      "men's clothing" => 'Ropa de hombre',
+      "women's clothing" => 'Ropa de mujer',
+      _ => category[0].toUpperCase() + category.substring(1),
+    };
   }
 }

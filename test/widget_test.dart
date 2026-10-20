@@ -54,4 +54,50 @@ void main() {
       expect(find.text('¡Qué bueno verte!'), findsOneWidget);
     }
   });
+
+  testWidgets('category chips and search filter the marketplace catalog', (
+    tester,
+  ) async {
+    final client = MockClient(
+      (_) async => http.Response(
+        '[{"id":1,"title":"Laptop portátil","price":499.99,'
+        '"description":"Equipo de prueba","category":"electronics",'
+        '"image":"https://example.com/laptop.png"},'
+        '{"id":2,"title":"Camisa clásica","price":29.99,'
+        '"description":"Prenda de prueba","category":"men\'s clothing",'
+        '"image":"https://example.com/shirt.png"}]',
+        200,
+      ),
+    );
+    addTearDown(client.close);
+    final apiService = ApiService(client: client);
+
+    await tester.pumpWidget(
+      MaterialApp(home: LoginScreen(apiService: apiService)),
+    );
+    await tester.enterText(find.byType(TextFormField).at(0), 'admin');
+    await tester.enterText(find.byType(TextFormField).at(1), '12345');
+    await tester.tap(find.text('Ingresar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Laptop portátil'), findsOneWidget);
+    expect(find.text('Camisa clásica'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('category-electronics')));
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.widget<Text>(find.byKey(const ValueKey('catalog-heading'))).data,
+      'Electrónica',
+    );
+    expect(find.text('Laptop portátil'), findsOneWidget);
+    expect(find.text('Camisa clásica'), findsNothing);
+
+    await tester.tap(find.byKey(const ValueKey('category-all')));
+    await tester.enterText(find.byType(TextField), 'camisa');
+    await tester.pumpAndSettle();
+
+    expect(find.text('Laptop portátil'), findsNothing);
+    expect(find.text('Camisa clásica'), findsOneWidget);
+  });
 }
